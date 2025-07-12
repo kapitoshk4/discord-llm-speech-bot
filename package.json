@@ -10,6 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@langchain/core": "^0.3.62",
+    "@langchain/langgraph": "^0.3.7",
+    "@langchain/openai": "^0.5.18",
     "discord.js": "^14.21.0",
     "dotenv": "^17.1.0",
     "openai": "^5.8.3"
