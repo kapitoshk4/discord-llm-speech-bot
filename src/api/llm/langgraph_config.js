@@ -17,6 +17,7 @@ const promptTemplate = ChatPromptTemplate.fromMessages([
 
 const GraphAnnotation = Annotation.Root({
     input: Annotation(),
+    imageUrl: Annotation(),
     chat_history: Annotation({
         reducer: messagesStateReducer,
         default: () => [],
@@ -26,11 +27,26 @@ const GraphAnnotation = Annotation.Root({
   
 async function chatWithHistory(state) {
     const trimmedChatHistory = state.chat_history.slice(-process.env.MAX_HISTORY_MESSAGES);
+    let promptMessages;
 
-    const promptMessages = await promptTemplate.formatMessages({
-        input: state.input,
-        chat_history: trimmedChatHistory,
-    });
+    if (state.imageUrl) {
+        promptMessages = [
+            { role: "system", content: process.env.OPENAI_INSTRUCTIONS },
+            ...trimmedChatHistory,
+            { 
+                role: "user", 
+                content: [
+                    { type: "text", text: state.input },
+                    { type: "image_url", image_url: {url: state.imageUrl} }
+                ] 
+            },
+        ];
+    } else {
+        promptMessages = await promptTemplate.formatMessages({
+            input: state.input,
+            chat_history: trimmedChatHistory,
+        });
+    }
 
     const response = await llm.invoke(promptMessages);
 
