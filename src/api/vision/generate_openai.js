@@ -7,20 +7,36 @@ const openai = new OpenAI({
 
 async function openaiGenerateImage(prompt) {
     try {
-        const result = await openai.images.generate({
+        const isGptImage1 = process.env.OPENAI_IMAGE_MODEL === "gpt-image-1";
+        
+        const requestPayload = {
             model: process.env.OPENAI_IMAGE_MODEL,
             prompt: `generate ${prompt}`,
-            size: process.env.IMAGE_SIZE,
-            n: parseInt(process.env.IMAGE_COUNT),
-        });
-        const imageUrl = result.data[0].url;
-        const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
-        const imageBuffer = Buffer.from(response.data);
+        };
+
+        if (isGptImage1) {
+            requestPayload.size = process.env.IMAGE_SIZE;
+            requestPayload.n = parseInt(process.env.IMAGE_COUNT);
+            requestPayload.quality = process.env.IMAGE_QUALITY;
+            requestPayload.moderation = process.env.IMAGE_MODERATION;
+        } else {
+            requestPayload.size = "1024x1024";
+        }
+
+        const result = await openai.images.generate(requestPayload);
+
+        const [imageData] = result.data;
+
+        const buffer = isGptImage1
+            ? Buffer.from(imageData.b64_json, "base64")
+            : Buffer.from(
+                (await axios.get(imageData.url, { responseType: "arraybuffer" })).data
+              );
 
         return {
-            buffer: imageBuffer,
-            name: `generated_image_${Date.now()}.png`
-        }
+            buffer,
+            name: `generated_image_${Date.now()}.png`,
+        };
     } catch (error) {
         if (error.code === "content_policy_violation") {
             throw new Error("Content policy violation: Please modify your input and try again.");
