@@ -13,6 +13,7 @@ module.exports = {
         await interaction.deferReply();
 
         const userInput = interaction.options.getString("input");
+        console.log(`User input for image generation: ${userInput}`);
         try {
             const { buffer, name } = await openaiGenerateImage(userInput);
 
@@ -21,8 +22,9 @@ module.exports = {
             await interaction.editReply({
                 files: [attachment]
             });
+            console.log(`Image generated and sent: ${name}`);
         } catch (error) {
-            await interaction.editReply(error.message || "An error occurred while generating the image.");
+            await interaction.editReply("An error occurred while generating the image.");
         }
     }
 }
