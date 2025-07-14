@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@discordjs/voice": "^0.18.0",
     "@langchain/core": "^0.3.62",
     "@langchain/langgraph": "^0.3.7",
     "@langchain/openai": "^0.5.18",
