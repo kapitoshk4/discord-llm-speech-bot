@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { joinVoiceChannel } = require("@discordjs/voice"); 
+const { joinVoiceChannel } = require("@discordjs/voice");
+const { handleRecording } = require("../services/audioHelper.js"); 
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -11,8 +12,7 @@ module.exports = {
                 .setRequired(false)),
     async execute(interaction) {
         const mode = interaction.options.getString("mode");
-        const member = interaction.guild?.members.cache.get(interaction.user.id);
-        const voiceChannel = member?.voice?.channel;
+        const voiceChannel = interaction.member.voice.channel;
 
         if (!voiceChannel) {
             return interaction.reply("You need to be in a voice channel for me to join.");
@@ -30,6 +30,7 @@ module.exports = {
             } else {
                 await interaction.reply("You asked me to join the voice channel.");
             }
+            handleRecording(connection, voiceChannel);
         } catch (error) {
             console.error("Error joining voice channel:", error);
         }
