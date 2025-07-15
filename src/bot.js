@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 
 const path = require("node:path");
 const fs = require("node:fs");
@@ -9,7 +9,8 @@ const client = new Client({
     IntentsBitField.Flags.Guilds,
     IntentsBitField.Flags.GuildMembers, 
     IntentsBitField.Flags.GuildMessages, 
-    IntentsBitField.Flags.MessageContent 
+    IntentsBitField.Flags.MessageContent,
+    IntentsBitField.Flags.GuildVoiceStates, 
 ]
 });
 
