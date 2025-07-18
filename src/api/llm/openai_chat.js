@@ -1,14 +1,16 @@
 const { app } = require("../llm/langgraph_config.js");
-const { getThreadId } = require("../llm/memory.js");
+const { getChatThreadId, getVcThreadId } = require("../../services/memory.js");
 
-async function openaiApiRequest(userId, prompt, imageUrl = null) {
+async function invokeWithThread(getIdFn, id, prompt, imageUrl = null) {
   try {
-    const threadId = getThreadId(userId);
+    const threadId = getIdFn(id);
     const config = { configurable: { thread_id: threadId } };
-    const input = {
-      input: prompt,
-      imageUrl: imageUrl,
+    const input = { input: prompt };
+
+    if (imageUrl) {
+      input.imageUrl = imageUrl;
     }
+
     const result = await app.invoke(input, config);
     console.log(`LangChain response: ${result.answer}`);
     return result.answer;
@@ -17,4 +19,11 @@ async function openaiApiRequest(userId, prompt, imageUrl = null) {
     throw error;
   }
 }
-module.exports = { openaiApiRequest };
+
+const getOpenAiResponseForUser = (userId, prompt, imageUrl = null) =>
+  invokeWithThread(getChatThreadId, userId, prompt, imageUrl);
+
+const getOpenAiResponseForVoiceChannel = (channelId, prompt) =>
+  invokeWithThread(getVcThreadId, channelId, prompt);
+
+module.exports = { getOpenAiResponseForUser, getOpenAiResponseForVoiceChannel };
