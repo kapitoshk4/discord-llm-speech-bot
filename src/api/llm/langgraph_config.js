@@ -52,9 +52,9 @@ async function chatWithHistory(state) {
 
     return {
         chat_history: [
-        ...state.chat_history,
-        new HumanMessage(state.input),
-        response,
+            ...state.chat_history,
+            new HumanMessage(state.input),
+            response,
         ],
         answer: response.content,
     };
