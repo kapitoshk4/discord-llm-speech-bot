@@ -1,5 +1,5 @@
 const { Events } = require("discord.js");
-const { openaiApiRequest } = require("../api/llm/openai_chat");
+const { getOpenAiResponseForUser } = require("../api/llm/openai_chat");
 
 module.exports = {
     name: Events.MessageCreate,
@@ -23,7 +23,7 @@ module.exports = {
           }
         console.log(`Received message: ${prompt}`);
 
-        const response = await openaiApiRequest(message.author.id, prompt, imageUrl);
+        const response = await getOpenAiResponseForUser(message.author.id, prompt, imageUrl);
 
         await message.reply(response);
        }
