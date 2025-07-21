@@ -1,7 +1,6 @@
 const { EndBehaviorType } = require("@discordjs/voice");
 const prism = require("prism-media");
 const ffmpeg = require("fluent-ffmpeg");
-const { PassThrough } = require("stream");
 const { sendAudioToAPI } = require("../api/audio/sst_openai");
 const { getOpenAiResponseForVoiceChannel } = require("../api/llm/openai_chat.js");
 const { handleTranscription } = require("./transcription.js");
@@ -31,38 +30,32 @@ function handleRecording(connection, channel) {
         }); 
 
         const pcmStream = listenStream.pipe(opusDecoder);
-
-        const ffmpegInput = new PassThrough();
-        const ffmpegOutput = new PassThrough();
-
-        pcmStream.pipe(ffmpegInput);
-
-        ffmpeg(ffmpegInput)
-            .inputFormat('s16le')
+        const ffmpegProcess = ffmpeg(pcmStream)
+            .inputFormat("s16le")
             .audioChannels(1)
             .audioFrequency(48000)
-            .format('mp3')
-            .on('error', (err) => {
-                console.error(`FFmpeg error: ${err.message}`);
-            })
-            .on('end', () => {
-                console.log(`Finished converting audio from ${userName}`);
-            })
-            .pipe(ffmpegOutput);
+            .format("wav")
+            .on("error", (err) => {
+                if (err.message !== "Output stream closed") {
+                    console.error(`❌ FFmpeg error: ${err.message}`);
+                }
+            });
 
         const chunks = [];
-        ffmpegOutput.on('data', (chunk) => {
+        const ffmpegStdout = ffmpegProcess.pipe();
+
+        ffmpegStdout.on("data", (chunk) => {
             chunks.push(chunk);
         });
 
-        ffmpegOutput.on('end', () => {
-            const mp3Buffer = Buffer.concat(chunks);
-            if (mp3Buffer.length < 6000) {
-                console.log(`Audio from ${userName} is too short (${mp3Buffer.length} bytes), skipping.`);
+        ffmpegStdout.on("end", () => {
+            const wavBuffer = Buffer.concat(chunks);
+            if (wavBuffer.length < 70000) {
+                console.log(`⚠️ Audio from ${userName} is too short (${wavBuffer.length} bytes), skipping.`);
                 return;
             }
-            console.log(`📤 Sending audio to API (${mp3Buffer.length} bytes)`);
-            processAudioResponse(mp3Buffer, userName, connection);
+            console.log(`📤 Sending audio to API (${wavBuffer.length} bytes)`);
+            processAudioResponse(wavBuffer, userName, connection);
         });
     });
 }
