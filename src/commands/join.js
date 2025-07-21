@@ -15,7 +15,10 @@ module.exports = {
         const voiceChannel = interaction.member.voice.channel;
 
         if (!voiceChannel) {
-            return interaction.reply("You need to be in a voice channel for me to join.");
+            return interaction.reply({
+                content: "You need to be in a voice channel for me to join.",
+                ephemeral: true
+            });
         }
         try {
             const connection = await joinVoiceChannel({
@@ -26,9 +29,15 @@ module.exports = {
             });
 
             if (mode === "mention") {
-                await interaction.reply(`You asked me to join the voice channel when you mention me.`);
+                await interaction.reply({
+                    content: "You asked me to join the voice channel when you mention me.",
+                    ephemeral: true
+                });
             } else {
-                await interaction.reply("You asked me to join the voice channel.");
+                await interaction.reply({
+                    content: "You asked me to join the voice channel.",
+                    ephemeral: true
+                });
             }
             handleRecording(connection, voiceChannel);
         } catch (error) {
