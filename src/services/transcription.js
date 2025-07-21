@@ -1,5 +1,5 @@
 function handleTranscription(transcription, userName) {
-    if (transcription.length < 2) {
+    if (!transcription || transcription.trim().split(/\s+/).length < 2) {
         return ["Skipping transcription, too short.", false];
     }
     resultWithoutPunctuationToLowerCase = transcription.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "").toLowerCase();
