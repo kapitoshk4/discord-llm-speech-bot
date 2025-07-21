@@ -13,8 +13,8 @@ async function sendAudioToAPI(buffer) {
     const form = new FormData();
 
     form.append("file", bufferToStream(buffer), {
-        filename: `audio.mp3`,
-        contentType: "audio/mpeg"
+        filename: `audio.wav`,
+        contentType: "audio/wav"
     });
 
     form.append("model", process.env.OPENAI_TRANSCRIPTION_MODEL);
