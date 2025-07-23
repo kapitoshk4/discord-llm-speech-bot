@@ -6,7 +6,6 @@ const path = require('node:path');
 
 const token = process.env.DISCORD_TOKEN;
 const clientId = process.env.CLIENT_ID;
-// const guildId = process.env.GUILD_ID;
 
 const commands = [];
 const commandsPath = path.join(__dirname, "commands");
@@ -30,7 +29,7 @@ const rest = new REST().setToken(token);
 
         await rest.put(
             Routes.applicationCommands(clientId),
-            // Use Routes.applicationCommands(clientId) for global commands
+            // Use Routes.applicationGuildCommands(clientId, guildId) for global commands
             { body: commands },
         );
 
