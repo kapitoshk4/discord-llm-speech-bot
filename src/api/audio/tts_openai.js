@@ -13,9 +13,6 @@ async function sendTextToTTS(text) {
         response_format: "wav",
     });
 
-    // const buffer = Buffer.from(await opusAudioResponse.arrayBuffer());
-    // console.log(`Generated TTS audio of length: ${buffer.length} bytes`);
-    // return buffer;
     return response.body;
 }
 
