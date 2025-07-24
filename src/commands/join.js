@@ -39,7 +39,7 @@ module.exports = {
                     ephemeral: true
                 });
             }
-            handleRecording(connection, voiceChannel);
+            handleRecording(connection, voiceChannel, mode === "mention");
         } catch (error) {
             console.error("Error joining voice channel:", error);
         }
