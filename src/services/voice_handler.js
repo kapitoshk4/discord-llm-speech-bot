@@ -7,7 +7,7 @@ const { handleTranscription } = require("./transcription.js");
 const { sendTextToTTS } = require("../api/audio/tts_openai.js");
 const { playAudioBuffer } = require("./audio_player.js");
 
-function handleRecording(connection, channel) {
+function handleRecording(connection, channel, requireMention = false) {
     const receiver = connection.receiver;
     receiver.speaking.on("start", (userId) => {
         const member = channel.members.get(userId);
@@ -55,14 +55,14 @@ function handleRecording(connection, channel) {
                 return;
             }
             console.log(`📤 Sending audio to API (${wavBuffer.length} bytes)`);
-            processAudioResponse(wavBuffer, userName, connection);
+            processAudioResponse(wavBuffer, userName, connection, requireMention);
         });
     });
 }
 
-async function processAudioResponse(buffer, userName, connection) {
+async function processAudioResponse(buffer, userName, connection, requireMention) {
     const transcription = await sendAudioToAPI(buffer);
-    const [userPrompt, status] = handleTranscription(transcription, userName);
+    const [userPrompt, status] = handleTranscription(transcription, userName, requireMention);
         if (!status) {
             console.log(userPrompt);
             return;
