@@ -1,5 +1,5 @@
 const { app } = require("../llm/langgraph_config.js");
-const { getChatThreadId, getVcThreadId } = require("../../services/memory.js");
+const { getChatThreadId, getVcThreadId } = require("../../services/get_thread.js");
 
 async function invokeWithThread(getIdFn, id, prompt, imageUrl = null) {
   try {
