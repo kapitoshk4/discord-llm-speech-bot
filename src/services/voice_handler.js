@@ -1,7 +1,7 @@
 const { EndBehaviorType } = require("@discordjs/voice");
 const prism = require("prism-media");
 const ffmpeg = require("fluent-ffmpeg");
-const { sendAudioToAPI } = require("../api/audio/sst_openai");
+const { sendAudioToAPI } = require("../api/audio/stt_openai.js");
 const { getOpenAiResponseForVoiceChannel } = require("../api/llm/openai_chat.js");
 const { handleTranscription } = require("./transcription.js");
 const { sendTextToTTS } = require("../api/audio/tts_openai.js");
@@ -63,10 +63,10 @@ function handleRecording(connection, channel, requireMention = false) {
 async function processAudioResponse(buffer, userName, connection, requireMention) {
     const transcription = await sendAudioToAPI(buffer);
     const [userPrompt, status] = handleTranscription(transcription, userName, requireMention);
-        if (!status) {
-            console.log(userPrompt);
-            return;
-        }
+    if (!status) {
+        console.log(userPrompt);
+        return;
+    }
 
     try {
         const response = await getOpenAiResponseForVoiceChannel(connection.joinConfig.channelId, userPrompt);
