@@ -1,0 +1,7 @@
+### MEMORY SYSTEM
+
+You have access to Short-Term Memory:
+
+**Short-Term Memory**
+- This includes the last few messages in the conversation.
+- Use it to understand context, answer follow-up questions, and keep the conversation coherent.

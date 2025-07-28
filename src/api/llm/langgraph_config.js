@@ -1,7 +1,17 @@
+const fs = require("fs");
+const path = require("path");
 const { ChatOpenAI } = require("@langchain/openai");
 const { ChatPromptTemplate, MessagesPlaceholder} = require("@langchain/core/prompts");
 const { HumanMessage } = require("@langchain/core/messages");
 const { StateGraph, START, END, MemorySaver, messagesStateReducer, Annotation } = require("@langchain/langgraph");
+
+const memoryRules = fs.readFileSync(path.join(__dirname, "..", "..", "..", "memory_rules.txt"), "utf-8");
+
+const systemPrompt = `
+    ${process.env.OPENAI_INSTRUCTIONS}
+
+    ${memoryRules}
+`;
 
 const llm = new ChatOpenAI({
     model: process.env.OPENAI_MODEL,
@@ -10,7 +20,7 @@ const llm = new ChatOpenAI({
   });
   
 const promptTemplate = ChatPromptTemplate.fromMessages([
-    ["system", process.env.OPENAI_INSTRUCTIONS],
+    ["system", systemPrompt],
     new MessagesPlaceholder("chat_history"),
     ["human", "{input}"],
 ]);
@@ -31,7 +41,7 @@ async function chatWithHistory(state) {
 
     if (state.imageUrl) {
         promptMessages = [
-            { role: "system", content: process.env.OPENAI_INSTRUCTIONS },
+            { role: "system", content: systemPrompt },
             ...trimmedChatHistory,
             { 
                 role: "user", 
