@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, AttachmentBuilder } = require("discord.js");
 const { openaiGenerateImage } = require("../api/vision/generate_openai");
-
+const { handleLimit } = require("../services/limit_handler");
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("generate")
@@ -11,6 +11,15 @@ module.exports = {
                 .setRequired(true)),
     async execute(interaction) {
         await interaction.deferReply();
+        
+        const userId = interaction.user.id
+
+        const allowed = await handleLimit(userId);
+
+        if (!allowed) {
+            await interaction.editReply("You have reached your weekly usage limit");
+            return;
+        }
 
         const userInput = interaction.options.getString("input");
         console.log(`User input for image generation: ${userInput}`);
