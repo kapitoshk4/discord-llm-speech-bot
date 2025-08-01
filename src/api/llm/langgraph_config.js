@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { ChatOpenAI } = require("@langchain/openai");
+const { ChatXAI } = require("@langchain/xai");
 const { ChatPromptTemplate, MessagesPlaceholder} = require("@langchain/core/prompts");
 const { HumanMessage } = require("@langchain/core/messages");
 const { StateGraph, START, END, MemorySaver, messagesStateReducer, Annotation } = require("@langchain/langgraph");
@@ -8,17 +9,11 @@ const { StateGraph, START, END, MemorySaver, messagesStateReducer, Annotation } 
 const memoryRules = fs.readFileSync(path.join(__dirname, "..", "..", "..", "memory_rules.txt"), "utf-8");
 
 const systemPrompt = `
-    ${process.env.OPENAI_INSTRUCTIONS}
+    ${process.env.INSTRUCTIONS}
 
     ${memoryRules}
 `;
 
-const llm = new ChatOpenAI({
-    model: process.env.OPENAI_MODEL,
-    temperature: parseFloat(process.env.TEMPERATURE),
-    apiKey: process.env.OPENAI_API_KEY,
-  });
-  
 const promptTemplate = ChatPromptTemplate.fromMessages([
     ["system", systemPrompt],
     new MessagesPlaceholder("chat_history"),
@@ -37,6 +32,21 @@ const GraphAnnotation = Annotation.Root({
   
 async function chatWithHistory(state) {
     const trimmedChatHistory = state.chat_history.slice(-process.env.MAX_HISTORY_MESSAGES);
+    let llm;
+    if (process.env.MODEL.toLowerCase().includes("grok")) {
+        llm = new ChatXAI({
+            model: process.env.MODEL,
+            temperature: parseFloat(process.env.TEMPERATURE) || 0,
+            apiKey: process.env.API_KEY,
+        });
+    } else {
+        llm = new ChatOpenAI({
+            model: process.env.MODEL,
+            temperature: parseFloat(process.env.TEMPERATURE),
+            apiKey: process.env.API_KEY,
+          });
+    }
+
     let promptMessages;
 
     if (state.imageUrl) {
