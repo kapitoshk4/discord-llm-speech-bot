@@ -2,7 +2,7 @@ const { EndBehaviorType } = require("@discordjs/voice");
 const prism = require("prism-media");
 const ffmpeg = require("fluent-ffmpeg");
 const { sendAudioToAPI } = require("../api/audio/stt_openai.js");
-const { getOpenAiResponseForVoiceChannel } = require("../api/llm/openai_chat.js");
+const { getResponseForVoiceChannel } = require("../api/llm/llm_chat.js");
 const { handleTranscription } = require("./transcription.js");
 const { sendTextToTTS } = require("../api/audio/tts_openai.js");
 const { playAudioBuffer } = require("./audio_player.js");
@@ -69,7 +69,7 @@ async function processAudioResponse(buffer, userName, connection, requireMention
     }
 
     try {
-        const response = await getOpenAiResponseForVoiceChannel(connection.joinConfig.channelId, userPrompt);
+        const response = await getResponseForVoiceChannel(connection.joinConfig.channelId, userPrompt);
 
         const ttsBuffer = await sendTextToTTS(response);
         
