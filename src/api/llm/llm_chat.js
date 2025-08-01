@@ -1,4 +1,4 @@
-const { app } = require("../llm/langgraph_config.js");
+const { app } = require("./langgraph_config.js");
 const { getChatThreadId, getVcThreadId } = require("../../services/get_thread.js");
 
 async function invokeWithThread(getIdFn, id, prompt, imageUrl = null) {
@@ -20,10 +20,10 @@ async function invokeWithThread(getIdFn, id, prompt, imageUrl = null) {
   }
 }
 
-const getOpenAiResponseForUser = (userId, prompt, imageUrl = null) =>
+const getResponseForUser = (userId, prompt, imageUrl = null) =>
   invokeWithThread(getChatThreadId, userId, prompt, imageUrl);
 
-const getOpenAiResponseForVoiceChannel = (channelId, prompt) =>
+const getResponseForVoiceChannel = (channelId, prompt) =>
   invokeWithThread(getVcThreadId, channelId, prompt);
 
-module.exports = { getOpenAiResponseForUser, getOpenAiResponseForVoiceChannel };
+module.exports = { getResponseForUser, getResponseForVoiceChannel };
