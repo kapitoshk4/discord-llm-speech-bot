@@ -1,5 +1,6 @@
 const { Events } = require("discord.js");
-const { getOpenAiResponseForUser } = require("../api/llm/openai_chat");
+const { getResponseForUser } = require("../api/llm/llm_chat");
+const { handleImageRecognitionLimit } = require("../services/limit_handler.js");
 
 module.exports = {
     name: Events.MessageCreate,
@@ -7,6 +8,7 @@ module.exports = {
         if (message.author.bot) return;
 
         const botId = message.client.user.id;
+        const userId = message.author.id
 
         const isMentioned = message.mentions.has(botId);
         const isReply = message.reference && message.reference.messageId;
@@ -15,6 +17,11 @@ module.exports = {
 
         const prompt = message.content.replace(`<@${botId}>`, "").trim();
         const imageAttachment = message.attachments.first();
+        const type = await handleImageRecognitionLimit(imageAttachment, userId);
+        if (type === "budget") {
+          await message.reply("You can't use image recognition at your current level");
+          return
+        }
         const imageUrl = imageAttachment ? imageAttachment.url : null;
         console.log(`Processing message: ${prompt}, Image URL: ${imageUrl}`);
         if (!prompt) {
@@ -23,7 +30,7 @@ module.exports = {
           }
         console.log(`Received message: ${prompt}`);
 
-        const response = await getOpenAiResponseForUser(message.author.id, prompt, imageUrl);
+        const response = await getResponseForUser(userId, prompt, imageUrl);
 
         await message.reply(response);
        }
