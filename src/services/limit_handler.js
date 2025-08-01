@@ -31,4 +31,18 @@ async function handleLimit(userId) {
     return true;
 }
 
-module.exports = { handleLimit }
+async function handleImageRecognitionLimit(imageAttachment, userId) {
+    const user = await User.findOne({
+        where: { discordId: userId },
+        include: Permission 
+      });
+    console.log(`User: ${user} wants to use image`)
+    const permission = user?.Permission?.name;
+    console.log(`Permission of this user ${permission}`)
+    if (imageAttachment && permission === "normal") {
+        return "budget";
+    }
+    return "pro";
+}
+
+module.exports = { handleLimit, handleImageRecognitionLimit }
