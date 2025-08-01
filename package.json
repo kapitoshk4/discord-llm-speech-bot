@@ -4,7 +4,9 @@
   "description": "",
   "main": "bot.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node deploy-commands.js && node bot.js",
+    "bot": "node bot.js",
+    "deploy": "node deploy-commands.js"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +17,7 @@
     "@langchain/core": "^0.3.62",
     "@langchain/langgraph": "^0.3.7",
     "@langchain/openai": "^0.5.18",
+    "@langchain/xai": "^0.1.0",
     "@sequelize/postgres": "^7.0.0-alpha.46",
     "axios": "^1.10.0",
     "discord.js": "^14.21.0",
